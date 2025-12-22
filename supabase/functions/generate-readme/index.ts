@@ -115,7 +115,20 @@ serve(async (req) => {
   }
 
   try {
-    const { repoUrl } = await req.json();
+    const { repoUrl, options } = await req.json();
+    
+    // Parse options
+    const style = options?.style || 'detailed';
+    const sections = options?.sections || {
+      features: true,
+      installation: true,
+      usage: true,
+      techStack: true,
+      projectStructure: true,
+      contributing: true,
+      license: true,
+      badges: true,
+    };
     
     if (!repoUrl) {
       return new Response(
@@ -214,24 +227,24 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an expert technical writer who creates beautiful, comprehensive README.md files for GitHub repositories. 
+            content: `You are an expert technical writer who creates beautiful README.md files for GitHub repositories.
 
-Your READMEs should include:
-1. A catchy project title with an emoji
-2. Badges (build status placeholder, license, language, stars)
-3. A compelling description
-4. Key features (bulleted list with emojis)
-5. Tech stack with icons/badges
-6. Prerequisites
-7. Installation instructions (step-by-step)
-8. Usage examples with code blocks
-9. Project structure (simplified tree)
-10. Contributing guidelines
-11. License
-12. Author/contact info
+STYLE: ${style === 'minimal' ? 'Keep it minimal and concise. Only essential information.' : style === 'badges' ? 'Heavy on shields.io badges everywhere. Make it look professional with lots of visual badges.' : 'Detailed and comprehensive with examples and thorough documentation.'}
+
+SECTIONS TO INCLUDE:
+${sections.badges ? '- Badges (shields.io style badges for build, license, language, version)' : ''}
+${sections.features ? '- Key Features (bulleted list with emojis)' : ''}
+${sections.techStack ? '- Tech Stack (with badges/icons)' : ''}
+${sections.installation ? '- Installation (step-by-step with code blocks)' : ''}
+${sections.usage ? '- Usage (examples with code blocks)' : ''}
+${sections.projectStructure ? '- Project Structure (simplified tree)' : ''}
+${sections.contributing ? '- Contributing guidelines' : ''}
+${sections.license ? '- License section' : ''}
+
+ALWAYS include: A catchy project title with emoji, and a compelling description.
 
 Use proper markdown formatting, code blocks with language hints, and make it visually appealing.
-Be specific to the project's actual technology stack and infer functionality from the file structure and dependencies.`
+Be specific to the project's actual technology stack.`
           },
           {
             role: 'user',
@@ -258,7 +271,7 @@ ${context.hasRequirementsTxt ? '- pip (Python)' : ''}
 ${context.hasCargoToml ? '- Cargo (Rust)' : ''}
 ${context.hasGoMod ? '- Go modules' : ''}
 
-Generate a complete, production-ready README.md file now. Make reasonable inferences about the project's purpose and features based on its name, description, languages, and dependencies.`
+Generate the README now following the specified style and sections.`
           }
         ],
       }),
