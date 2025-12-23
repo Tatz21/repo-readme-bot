@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface RepoInfo {
   name: string;
@@ -144,15 +145,18 @@ export default function Index() {
               </div>
               <span className="font-bold text-xl text-foreground">README<span className="text-gradient">.gen</span></span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowOptions(true)}
-              className="gap-2"
-            >
-              <Settings2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Customize</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowOptions(true)}
+                className="gap-2"
+              >
+                <Settings2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Customize</span>
+              </Button>
+            </div>
           </div>
         </header>
 
