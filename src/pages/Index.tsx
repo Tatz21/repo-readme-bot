@@ -4,7 +4,7 @@ import { ReadmePreview } from '@/components/ReadmePreview';
 import { LoadingState } from '@/components/LoadingState';
 import { StyleOptions, defaultOptions, type ReadmeOptions } from '@/components/StyleOptions';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, Github, Zap, Wand2, Settings2, RefreshCw, Sparkles } from 'lucide-react';
+import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 
@@ -144,25 +144,15 @@ export default function Index() {
               </div>
               <span className="font-bold text-xl text-foreground">README<span className="text-gradient">.gen</span></span>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowOptions(true)}
-                className="gap-2"
-              >
-                <Settings2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Customize</span>
-              </Button>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Github className="w-6 h-6" />
-              </a>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowOptions(true)}
+              className="gap-2"
+            >
+              <Settings2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Customize</span>
+            </Button>
           </div>
         </header>
 
