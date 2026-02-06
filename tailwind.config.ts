@@ -77,8 +77,8 @@ export default {
           to: { height: "0" },
         },
         shimmer: {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
         },
         "spin-slow": {
           from: { transform: "rotate(0deg)" },
@@ -87,13 +87,24 @@ export default {
         "border-beam": {
           "100%": { offsetDistance: "100%" },
         },
+        "copy-flash": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.12)" },
+        },
+        "gradient-shift": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 2s linear infinite",
+        shimmer: "shimmer 1.5s ease-in-out infinite",
         "spin-slow": "spin-slow 3s linear infinite",
         "border-beam": "border-beam 4s linear infinite",
+        "copy-flash": "copy-flash 0.3s ease-out",
+        "gradient-shift": "gradient-shift 4s linear infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
