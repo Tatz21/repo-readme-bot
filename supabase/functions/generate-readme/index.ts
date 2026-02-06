@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface RepoData {
@@ -27,167 +27,105 @@ interface FileContent {
 async function fetchRepoData(owner: string, repo: string): Promise<RepoData> {
   console.log(`Fetching repo data for ${owner}/${repo}`);
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'README-Generator'
-    }
+    headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'README-Generator' }
   });
-  
   if (!response.ok) {
     throw new Error(`Failed to fetch repository: ${response.status} ${response.statusText}`);
   }
-  
   return response.json();
 }
 
 async function fetchRepoContents(owner: string, repo: string, path: string = ''): Promise<FileContent[]> {
   console.log(`Fetching repo contents for ${owner}/${repo}/${path}`);
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'README-Generator'
-    }
+    headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'README-Generator' }
   });
-  
-  if (!response.ok) {
-    console.error(`Failed to fetch contents: ${response.status}`);
-    return [];
-  }
-  
+  if (!response.ok) return [];
   const data = await response.json();
   return Array.isArray(data) ? data : [data];
 }
 
 async function fetchFileContent(owner: string, repo: string, path: string): Promise<string> {
-  console.log(`Fetching file content for ${path}`);
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'README-Generator'
-    }
+    headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'README-Generator' }
   });
-  
-  if (!response.ok) {
-    return '';
-  }
-  
+  if (!response.ok) return '';
   const data = await response.json();
-  if (data.content) {
-    return atob(data.content);
-  }
+  if (data.content) return atob(data.content);
   return '';
 }
 
 async function fetchLanguages(owner: string, repo: string): Promise<Record<string, number>> {
-  console.log(`Fetching languages for ${owner}/${repo}`);
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/languages`, {
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'README-Generator'
-    }
+    headers: { 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'README-Generator' }
   });
-  
-  if (!response.ok) {
-    return {};
-  }
-  
+  if (!response.ok) return {};
   return response.json();
 }
 
 function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
-  const patterns = [
-    /github\.com\/([^\/]+)\/([^\/]+)/,
-    /^([^\/]+)\/([^\/]+)$/
-  ];
-  
+  const patterns = [/github\.com\/([^\/]+)\/([^\/]+)/, /^([^\/]+)\/([^\/]+)$/];
   for (const pattern of patterns) {
     const match = url.replace(/\.git$/, '').match(pattern);
-    if (match) {
-      return { owner: match[1], repo: match[2] };
-    }
+    if (match) return { owner: match[1], repo: match[2] };
   }
   return null;
 }
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
     const { repoUrl, options } = await req.json();
-    
-    // Parse options
     const style = options?.style || 'detailed';
     const sections = options?.sections || {
-      features: true,
-      installation: true,
-      usage: true,
-      techStack: true,
-      projectStructure: true,
-      contributing: true,
-      license: true,
-      badges: true,
+      features: true, installation: true, usage: true, techStack: true,
+      projectStructure: true, contributing: true, license: true, badges: true,
     };
-    
+
     if (!repoUrl) {
-      return new Response(
-        JSON.stringify({ error: 'Repository URL is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Repository URL is required' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     const parsed = parseGitHubUrl(repoUrl);
     if (!parsed) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid GitHub URL format' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Invalid GitHub URL format' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     const { owner, repo } = parsed;
     console.log(`Processing repository: ${owner}/${repo}`);
 
-    // Fetch all data in parallel
     const [repoData, contents, languages] = await Promise.all([
       fetchRepoData(owner, repo),
       fetchRepoContents(owner, repo),
       fetchLanguages(owner, repo)
     ]);
 
-    // Find and fetch key files
     const keyFiles = ['package.json', 'requirements.txt', 'Cargo.toml', 'go.mod', 'pom.xml', 'build.gradle', 'Gemfile', 'composer.json'];
     const foundKeyFiles: Record<string, string> = {};
-    
     for (const file of contents) {
       if (keyFiles.includes(file.name)) {
         const content = await fetchFileContent(owner, repo, file.name);
-        if (content) {
-          foundKeyFiles[file.name] = content;
-        }
+        if (content) foundKeyFiles[file.name] = content;
       }
     }
 
-    // Build file tree structure (first level only)
-    const fileTree = contents
-      .map(f => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`)
-      .join('\n');
+    const fileTree = contents.map(f => `${f.type === 'dir' ? '📁' : '📄'} ${f.name}`).join('\n');
 
-    // Parse dependencies from package.json if present
     let dependencies: string[] = [];
     if (foundKeyFiles['package.json']) {
       try {
         const pkg = JSON.parse(foundKeyFiles['package.json']);
-        dependencies = [
-          ...Object.keys(pkg.dependencies || {}),
-          ...Object.keys(pkg.devDependencies || {})
-        ].slice(0, 20);
-      } catch {
-        console.log('Failed to parse package.json');
-      }
+        dependencies = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})].slice(0, 20);
+      } catch { console.log('Failed to parse package.json'); }
     }
 
-    // Prepare context for AI
     const context = {
       name: repoData.name,
       description: repoData.description || 'No description provided',
@@ -208,13 +146,10 @@ serve(async (req) => {
       hasGoMod: !!foundKeyFiles['go.mod']
     };
 
-    console.log('Context prepared, calling AI...');
+    console.log('Context prepared, calling AI with streaming...');
 
-    // Generate README with AI
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
-    }
+    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -265,7 +200,7 @@ ${context.fileTree}
 
 **Dependencies/Packages:** ${context.dependencies.length > 0 ? context.dependencies.join(', ') : 'Not available'}
 
-**Package Managers Detected:** 
+**Package Managers Detected:**
 ${context.hasPackageJson ? '- npm/yarn (Node.js)' : ''}
 ${context.hasRequirementsTxt ? '- pip (Python)' : ''}
 ${context.hasCargoToml ? '- Cargo (Rust)' : ''}
@@ -274,49 +209,100 @@ ${context.hasGoMod ? '- Go modules' : ''}
 Generate the README now following the specified style and sections.`
           }
         ],
+        stream: true,
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI API error:', aiResponse.status, errorText);
-      
+
       if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
+          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
       if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }), {
+          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
-      
       throw new Error(`AI generation failed: ${aiResponse.status}`);
     }
 
-    const aiData = await aiResponse.json();
-    const readme = aiData.choices?.[0]?.message?.content || '';
+    const repoInfo = {
+      name: context.name, owner: context.owner, description: context.description,
+      language: context.language, stars: context.stars, forks: context.forks, url: context.url,
+    };
 
-    console.log('README generated successfully');
+    const encoder = new TextEncoder();
+    const body = new ReadableStream({
+      async start(controller) {
+        // Send repo info first
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'info', repoInfo })}\n\n`));
 
-    return new Response(
-      JSON.stringify({ 
-        readme,
-        repoInfo: {
-          name: context.name,
-          owner: context.owner,
-          description: context.description,
-          language: context.language,
-          stars: context.stars,
-          forks: context.forks,
-          url: context.url
+        if (!aiResponse.body) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', error: 'No AI response body' })}\n\n`));
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          controller.close();
+          return;
         }
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+
+        const reader = aiResponse.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+
+            let idx: number;
+            while ((idx = buf.indexOf('\n')) !== -1) {
+              let line = buf.slice(0, idx);
+              buf = buf.slice(idx + 1);
+              if (line.endsWith('\r')) line = line.slice(0, -1);
+              if (line.startsWith(':') || line.trim() === '') continue;
+              if (!line.startsWith('data: ')) continue;
+
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr === '[DONE]') {
+                controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+                controller.close();
+                return;
+              }
+
+              try {
+                const chunk = JSON.parse(jsonStr);
+                const content = chunk.choices?.[0]?.delta?.content;
+                if (content) {
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'content', text: content })}\n\n`));
+                }
+              } catch {
+                // partial JSON, skip
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Stream processing error:', e);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', error: 'Stream interrupted' })}\n\n`));
+        }
+
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      }
+    });
+
+    console.log('Streaming README generation started');
+
+    return new Response(body, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+      },
+    });
 
   } catch (error) {
     console.error('Error in generate-readme:', error);
