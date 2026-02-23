@@ -22,6 +22,7 @@ interface ReadmePreviewProps {
   repoInfo: RepoInfo;
   onReadmeUpdate: (newReadme: string) => void;
   isStreaming?: boolean;
+  onSectionEdit?: (title: string, content: string) => void;
 }
 
 interface Section {
@@ -83,7 +84,7 @@ function parseReadmeIntoSections(readme: string): Section[] {
   return sections;
 }
 
-export function ReadmePreview({ readme, repoInfo, onReadmeUpdate, isStreaming }: ReadmePreviewProps) {
+export function ReadmePreview({ readme, repoInfo, onReadmeUpdate, isStreaming, onSectionEdit }: ReadmePreviewProps) {
   const [view, setView] = useState<'preview' | 'raw' | 'split'>('preview');
   const [copied, setCopied] = useState(false);
   const [copiedHtml, setCopiedHtml] = useState(false);
@@ -175,7 +176,18 @@ export function ReadmePreview({ readme, repoInfo, onReadmeUpdate, isStreaming }:
             onMouseLeave={() => setHoveredSection(null)}
           >
             {hoveredSection === section.id && !isStreaming && (
-              <div className="absolute -right-2 top-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute -right-2 top-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                {onSectionEdit && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onSectionEdit(section.title, section.content)}
+                    className="h-8 gap-1.5 bg-card shadow-lg border-primary/30 hover:border-primary hover:bg-primary/10"
+                  >
+                    <Wand2 className="w-3 h-3" />
+                    <span className="text-xs">Edit</span>
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -190,7 +202,7 @@ export function ReadmePreview({ readme, repoInfo, onReadmeUpdate, isStreaming }:
                     </>
                   ) : (
                     <>
-                      <Wand2 className="w-3 h-3" />
+                      <RefreshCw className="w-3 h-3" />
                       <span className="text-xs">Regenerate</span>
                     </>
                   )}

@@ -14,7 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          custom_color_scheme: Json | null
+          custom_footer: string | null
+          custom_logo_url: string | null
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          custom_color_scheme?: Json | null
+          custom_footer?: string | null
+          custom_logo_url?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          custom_color_scheme?: Json | null
+          custom_footer?: string | null
+          custom_logo_url?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      readme_history: {
+        Row: {
+          created_at: string
+          id: string
+          options: Json | null
+          readme_content: string
+          repo_name: string
+          repo_owner: string
+          repo_url: string
+          score: number | null
+          score_details: Json | null
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          options?: Json | null
+          readme_content: string
+          repo_name: string
+          repo_owner: string
+          repo_url: string
+          score?: number | null
+          score_details?: Json | null
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          options?: Json | null
+          readme_content?: string
+          repo_name?: string
+          repo_owner?: string
+          repo_url?: string
+          score?: number | null
+          score_details?: Json | null
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      shared_readmes: {
+        Row: {
+          branding: Json | null
+          created_at: string
+          id: string
+          readme_content: string
+          repo_name: string
+          repo_url: string
+          slug: string
+          user_id: string | null
+          views: number
+        }
+        Insert: {
+          branding?: Json | null
+          created_at?: string
+          id?: string
+          readme_content: string
+          repo_name: string
+          repo_url: string
+          slug: string
+          user_id?: string | null
+          views?: number
+        }
+        Update: {
+          branding?: Json | null
+          created_at?: string
+          id?: string
+          readme_content?: string
+          repo_name?: string
+          repo_url?: string
+          slug?: string
+          user_id?: string | null
+          views?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
