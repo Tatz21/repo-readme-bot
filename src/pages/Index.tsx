@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { RepoInput } from '@/components/RepoInput';
 import { ReadmePreview } from '@/components/ReadmePreview';
 import { LoadingState } from '@/components/LoadingState';
 import { StyleOptions, defaultOptions, type ReadmeOptions } from '@/components/StyleOptions';
 import { TemplatePresets } from '@/components/TemplatePresets';
+import { ShareDialog } from '@/components/ShareDialog';
+import { BulkGenerator } from '@/components/BulkGenerator';
+import { ReadmeScore } from '@/components/ReadmeScore';
+import { BrandingSettings } from '@/components/BrandingSettings';
+import { ImportReadme } from '@/components/ImportReadme';
+import { SectionEditor } from '@/components/SectionEditor';
 import { useToast } from '@/hooks/use-toast';
-import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github, History, Share2, Layers, BarChart3, Paintbrush, Upload, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -26,8 +34,38 @@ export default function Index() {
   const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
   const [options, setOptions] = useState<ReadmeOptions>(defaultOptions);
   const [showOptions, setShowOptions] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
+  const [showScore, setShowScore] = useState(false);
+  const [showBranding, setShowBranding] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [editingSection, setEditingSection] = useState<{ title: string; content: string } | null>(null);
   const [lastUrl, setLastUrl] = useState<string>('');
+  const [user, setUser] = useState<any>(null);
+  const [branding, setBranding] = useState<{ logo_url: string; footer: string }>({ logo_url: '', footer: '' });
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Auth listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user || null));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Restore from history navigation
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.readme && state?.repoInfo) {
+      setReadme(state.readme);
+      setRepoInfo(state.repoInfo);
+      setLastUrl(state.repoInfo.url);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -50,10 +88,7 @@ export default function Index() {
   const handleGenerate = async (url: string, regenerate = false) => {
     setIsLoading(true);
     setIsStreaming(true);
-    if (!regenerate) {
-      setReadme('');
-      setRepoInfo(null);
-    }
+    if (!regenerate) { setReadme(''); setRepoInfo(null); }
     setLastUrl(url);
 
     try {
@@ -72,13 +107,9 @@ export default function Index() {
 
       if (!response.ok) {
         let errorMsg = 'Failed to generate README';
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.error || errorMsg;
-        } catch {}
+        try { const d = await response.json(); errorMsg = d.error || errorMsg; } catch {}
         throw new Error(errorMsg);
       }
-
       if (!response.body) throw new Error('No response body');
 
       const reader = response.body.getReader();
@@ -86,11 +117,9 @@ export default function Index() {
       let buffer = '';
       let readmeContent = '';
       let updateTimer: number | null = null;
+      let currentRepoInfo: RepoInfo | null = null;
 
-      const flushReadme = () => {
-        setReadme(readmeContent);
-        updateTimer = null;
-      };
+      const flushReadme = () => { setReadme(readmeContent); updateTimer = null; };
 
       while (true) {
         const { done, value } = await reader.read();
@@ -110,39 +139,40 @@ export default function Index() {
 
           try {
             const parsed = JSON.parse(jsonStr);
-            if (parsed.type === 'info') {
-              setRepoInfo(parsed.repoInfo);
-            } else if (parsed.type === 'content') {
+            if (parsed.type === 'info') { currentRepoInfo = parsed.repoInfo; setRepoInfo(parsed.repoInfo); }
+            else if (parsed.type === 'content') {
               readmeContent += parsed.text;
-              if (!updateTimer) {
-                updateTimer = window.setTimeout(flushReadme, 50);
-              }
-            } else if (parsed.type === 'error') {
-              throw new Error(parsed.error);
-            }
-          } catch (e) {
-            if (e instanceof SyntaxError) continue;
-            throw e;
-          }
+              if (!updateTimer) updateTimer = window.setTimeout(flushReadme, 50);
+            } else if (parsed.type === 'error') throw new Error(parsed.error);
+          } catch (e) { if (e instanceof SyntaxError) continue; throw e; }
         }
       }
 
-      // Final flush
       if (updateTimer) clearTimeout(updateTimer);
       if (readmeContent) {
         setReadme(readmeContent);
-        toast({
-          title: regenerate ? "README Regenerated!" : "README Generated!",
-          description: "Successfully created README",
-        });
+        toast({ title: regenerate ? "README Regenerated!" : "README Generated!" });
+
+        // Save to history if logged in
+        if (user && currentRepoInfo) {
+          const repoName = currentRepoInfo.name;
+          const repoOwner = currentRepoInfo.owner;
+          // Get version count
+          const { count } = await supabase.from('readme_history' as any).select('*', { count: 'exact', head: true }).eq('repo_url', url).eq('user_id', user.id);
+          await supabase.from('readme_history' as any).insert({
+            user_id: user.id,
+            repo_url: url,
+            repo_name: repoName,
+            repo_owner: repoOwner,
+            readme_content: readmeContent,
+            options,
+            version: (count || 0) + 1,
+          });
+        }
       }
     } catch (error) {
       console.error('Generation error:', error);
-      toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : 'Something went wrong',
-        variant: "destructive",
-      });
+      toast({ title: "Generation Failed", description: error instanceof Error ? error.message : 'Something went wrong', variant: "destructive" });
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
@@ -151,16 +181,36 @@ export default function Index() {
 
   const handleOptionsChange = (newOptions: ReadmeOptions) => {
     setOptions(newOptions);
-    toast({ title: "Settings Updated", description: "Generate again to apply the new style" });
+    toast({ title: "Settings Updated", description: "Generate again to apply" });
   };
 
   const handleTemplateSelect = (templateOptions: ReadmeOptions, label: string) => {
     setOptions(templateOptions);
-    toast({ title: `${label} Template Applied`, description: "Generate a README with this template" });
+    toast({ title: `${label} Template Applied` });
   };
 
-  const handleReadmeUpdate = (newReadme: string) => {
-    setReadme(newReadme);
+  const handleReadmeUpdate = (newReadme: string) => setReadme(newReadme);
+
+  const handleSectionEdit = (title: string, content: string) => {
+    setEditingSection({ title, content });
+  };
+
+  const handleSectionEditUpdate = (newContent: string) => {
+    if (!editingSection) return;
+    const lines = readme.split('\n');
+    const sections = parseIntoSections(readme);
+    const section = sections.find(s => s.title === editingSection.title);
+    if (section) {
+      const before = lines.slice(0, section.startIndex).join('\n');
+      const after = lines.slice(section.endIndex + 1).join('\n');
+      setReadme([before, newContent, after].filter(Boolean).join('\n'));
+    }
+    setEditingSection(null);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({ title: 'Signed out' });
   };
 
   const features = [
@@ -168,17 +218,29 @@ export default function Index() {
     { icon: Wand2, title: 'AI-Powered', description: 'Uses advanced AI to generate contextual, professional content' },
     { icon: Zap, title: 'Instant Output', description: 'Get a complete README in seconds, ready to use' },
     { icon: Settings2, title: 'Customizable', description: 'Choose your style and pick which sections to include' },
-    { icon: RefreshCw, title: 'Regenerate Sections', description: 'Hover over any section to regenerate just that part' },
-    { icon: Sparkles, title: 'Multiple Styles', description: 'Minimal, detailed, or badge-heavy — your choice' },
+    { icon: RefreshCw, title: 'Section Editing', description: 'Click any section to refine it with AI using custom prompts' },
+    { icon: Sparkles, title: 'Score & Share', description: 'Get quality scores, share via link, and bulk generate' },
   ];
 
   return (
     <div className="min-h-screen bg-background bg-grid-pattern">
-      {showOptions && (
-        <StyleOptions options={options} onChange={handleOptionsChange} onClose={() => setShowOptions(false)} />
+      {showOptions && <StyleOptions options={options} onChange={handleOptionsChange} onClose={() => setShowOptions(false)} />}
+      {showShare && repoInfo && <ShareDialog readme={readme} repoName={repoInfo.name} repoUrl={repoInfo.url} branding={branding} onClose={() => setShowShare(false)} />}
+      {showBulk && <BulkGenerator onClose={() => setShowBulk(false)} options={options} />}
+      {showScore && <ReadmeScore readme={readme} repoName={repoInfo?.name || ''} onClose={() => setShowScore(false)} />}
+      {showBranding && <BrandingSettings onClose={() => setShowBranding(false)} onSave={setBranding} />}
+      {showImport && <ImportReadme onImport={(r) => { setReadme(r); setRepoInfo({ name: 'Imported', owner: 'user', description: 'Imported README', language: '', stars: 0, forks: 0, url: '' }); }} onClose={() => setShowImport(false)} />}
+      {editingSection && repoInfo && (
+        <SectionEditor
+          sectionTitle={editingSection.title}
+          sectionContent={editingSection.content}
+          repoInfo={repoInfo}
+          onUpdate={handleSectionEditUpdate}
+          onClose={() => setEditingSection(null)}
+        />
       )}
 
-      {/* Background decoration */}
+      {/* Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
         <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-glow-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }} />
@@ -197,15 +259,39 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowOptions(true)}
-                className="gap-2 hover:scale-105 active:scale-95 transition-transform"
-              >
+              {user && (
+                <Button variant="ghost" size="sm" onClick={() => navigate('/history')} className="gap-1.5">
+                  <History className="w-4 h-4" />
+                  <span className="hidden sm:inline">History</span>
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => setShowBulk(true)} className="gap-1.5 hidden sm:flex">
+                <Layers className="w-4 h-4" />
+                Bulk
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowImport(true)} className="gap-1.5 hidden sm:flex">
+                <Upload className="w-4 h-4" />
+                Import
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5">
                 <Settings2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Customize</span>
               </Button>
+              {user ? (
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => setShowBranding(true)}>
+                    <Paintbrush className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="gap-1.5">
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </Button>
+              )}
             </div>
           </div>
         </header>
@@ -213,31 +299,21 @@ export default function Index() {
         {/* Hero */}
         <section className="container mx-auto px-4 pt-16 pb-12">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium hover:bg-secondary/80 transition-colors">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
               <Zap className="w-4 h-4 text-primary" />
               AI-Powered README Generator
             </div>
-
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Generate Perfect
-              <br />
+              Generate Perfect<br />
               <span className="text-gradient animated-gradient-text">README Files</span>
             </h1>
-
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Paste any GitHub repository URL and get a professional,
-              comprehensive README.md instantly powered by AI.
+              Paste any GitHub repository URL and get a professional, comprehensive README.md instantly powered by AI.
             </p>
-
-            {/* Style + template indicators */}
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <span>Style:</span>
-              <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">
-                {options.style}
-              </span>
-              <button onClick={() => setShowOptions(true)} className="text-primary hover:underline">
-                Change
-              </button>
+              <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{options.style}</span>
+              <button onClick={() => setShowOptions(true)} className="text-primary hover:underline">Change</button>
             </div>
           </div>
         </section>
@@ -270,28 +346,25 @@ export default function Index() {
           </section>
         )}
 
-        {/* Regenerate with new options button */}
+        {/* Action bar when readme exists */}
         {readme && !isLoading && lastUrl && (
           <section className="container mx-auto px-4 pb-4">
-            <div className="flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowOptions(true)}
-                className="gap-2 hover:scale-105 active:scale-95 transition-transform"
-              >
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5">
                 <Settings2 className="w-4 h-4" />
-                Adjust Settings
+                Settings
               </Button>
-              <Button
-                variant="glow"
-                size="sm"
-                onClick={() => handleGenerate(lastUrl, true)}
-                className="gap-2"
-              >
+              <Button variant="glow" size="sm" onClick={() => handleGenerate(lastUrl, true)} className="gap-1.5">
                 <RefreshCw className="w-4 h-4" />
-                Regenerate Full README
-                <kbd className="hidden sm:inline ml-1 text-[10px] opacity-60 font-mono">⌘↵</kbd>
+                Regenerate
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowShare(true)} className="gap-1.5">
+                <Share2 className="w-4 h-4" />
+                Share
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowScore(true)} className="gap-1.5">
+                <BarChart3 className="w-4 h-4" />
+                Score
               </Button>
             </div>
           </section>
@@ -306,19 +379,17 @@ export default function Index() {
               repoInfo={repoInfo}
               onReadmeUpdate={handleReadmeUpdate}
               isStreaming={isStreaming}
+              onSectionEdit={handleSectionEdit}
             />
           )}
         </section>
 
-        {/* Features (show when no result) */}
+        {/* Features */}
         {!readme && !isLoading && (
           <section className="container mx-auto px-4 pb-20">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {features.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5"
-                >
+                <div key={feature.title} className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
                   <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
@@ -330,7 +401,6 @@ export default function Index() {
           </section>
         )}
 
-        {/* Footer */}
         <footer className="border-t border-border/50">
           <div className="container mx-auto px-4 py-6">
             <p className="text-center text-sm text-muted-foreground">
@@ -341,4 +411,21 @@ export default function Index() {
       </div>
     </div>
   );
+}
+
+// Helper to parse sections (duplicated for use in handleSectionEditUpdate)
+function parseIntoSections(readme: string) {
+  const sections: { title: string; startIndex: number; endIndex: number }[] = [];
+  const lines = readme.split('\n');
+  let current: { title: string; startIndex: number; endIndex: number } | null = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(/^(#{1,3})\s+(.+)$/);
+    if (match) {
+      if (current) { current.endIndex = i - 1; sections.push(current); }
+      current = { title: match[2].replace(/[^\w\s]/g, '').trim(), startIndex: i, endIndex: i };
+    }
+  }
+  if (current) { current.endIndex = lines.length - 1; sections.push(current); }
+  return sections;
 }
