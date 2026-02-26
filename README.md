@@ -1,219 +1,203 @@
-# ✨ repo-readme-bot ✨
+# 🤖 `repo-readme-bot` 🚀
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Tatz21/repo-readme-bot/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/language-TypeScript-blue)](https://www.typescriptlang.org/)
-[![Version](https://img.shields.io/github/package-json/v/Tatz21/repo-readme-bot?color=007ACC)](package.json)
-[![Stars](https://img.shields.io/github/stars/Tatz21/repo-readme-bot?style=social)](https://github.com/Tatz21/repo-readme-bot/stargazers)
+A sophisticated AI-powered README generator designed to craft stunning and informative `README.md` files for your GitHub repositories. Say goodbye to manual README creation and let the bot do the heavy lifting!
 
-## 🚀 Overview
+## 🛡️ Badges
 
-`repo-readme-bot` is an innovative project designed to effortlessly generate professional and comprehensive `README.md` files for GitHub repositories. Leveraging the power of modern web technologies and a well-structured backend, this bot aims to streamline the documentation process, ensuring every project is presented with clarity and style. Say goodbye to manual README creation and hello to automated, high-quality project documentation!
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Tatz21/repo-readme-bot/ci.yml?branch=main&style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/actions/workflows/ci.yml)
+[![GitHub language count](https://img.shields.io/github/languages/count/Tatz21/repo-readme-bot?style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/)
+[![Top Language](https://img.shields.io/github/languages/top/Tatz21/repo-readme-bot?color=blue&style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/)
+[![Last Commit](https://img.shields.io/github/last-commit/Tatz21/repo-readme-bot?style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/commits/main)
+[![Stars](https://img.shields.io/github/stars/Tatz21/repo-readme-bot?style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/stargazers)
+[![Forks](https://img.shields.io/github/forks/Tatz21/repo-readme-bot?style=for-the-badge)](https://github.com/Tatz21/repo-readme-bot/network/members)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-This repository serves as the foundational code for the README generation bot, featuring a robust frontend built with React and Shadcn UI, a backend for processing, and integration with Supabase for data management.
+## ✨ Key Features
 
-## 🌟 Key Features
-
-*   **Automated README Generation:** 🤖 Produce detailed and structured `README.md` files with minimal effort.
-*   **Customizable Sections:** 🧩 Include standard sections such as installation, usage, tech stack, and more.
-*   **Dynamic Content Insertion:** 📝 Automatically pull repository details like languages, dependencies, and license information.
-*   **Modern UI/UX:** 🎨 Intuitive interface built with React and Shadcn UI for a seamless user experience.
-*   **Scalable Backend:** ⚙️ Robust architecture capable of handling multiple requests efficiently.
-*   **Supabase Integration:** 🔗 Leverage Supabase for secure and reliable data storage and authentication (if implemented).
+*   **自動生成** README.md: Crafts comprehensive and visually appealing READMEs with ease. ✍️
+*   **Highly Customizable**: Tailor sections and content to match your project's unique needs. 🎨
+*   **Shields.io Integration**: Automatically adds dynamic and informative badges. 📈
+*   **Rich Markdown Support**: Generates professional-grade markdown with proper formatting, code blocks, and more. 📝
+*   **Multi-language Detection**: Identifies and highlights the programming languages used in your repository. 🌐
+*   **Interactive UI**: (Presumed based on Radix UI dependencies) Provides an intuitive interface for input and configuration. 💻
 
 ## 🛠️ Tech Stack
 
-### Frontend
-*   **TypeScript**: <img alt="TypeScript" src="https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" /> - Primary language for robust and scalable applications.
-*   **React**: <img alt="React" src="https://img.shields.io/badge/-React-61DAFB?style=flat-square&logo=react&logoColor=black" /> - A JavaScript library for building user interfaces.
-*   **Vite**: <img alt="Vite" src="https://img.shields.io/badge/-Vite-646CFF?style=flat-square&logo=vite&logoColor=white" /> - Next-generation frontend tooling.
-*   **Tailwind CSS**: <img alt="TailwindCSS" src="https://img.shields.io/badge/-TailwindCSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" /> - A utility-first CSS framework for rapidly building custom designs.
-*   **Shadcn UI**: <img alt="ShadcnUI" src="https://img.shields.io/badge/-ShadcnUI-000000?style=flat-square&logo=vercel&logoColor=white" /> - A collection of re-usable components for building modern web applications.
-*   **Radix UI**: <img alt="RadixUI" src="https://img.shields.io/badge/-RadixUI-163D7A?style=flat-square&logo=radix-ui&logoColor=white" /> - Unstyled, accessible components for building high-quality design systems.
+This project is built using a modern and robust technology stack.
 
-### Backend & Database
-*   **Node.js**: <img alt="Node.js" src="https://img.shields.io/badge/-Node.js-339933?style=flat-square&logo=node.js&logoColor=white" /> - JavaScript runtime for server-side logic and API.
-*   **Supabase**: <img alt="Supabase" src="https://img.shields.io/badge/-Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white" /> - Open-source Firebase alternative providing a PostgreSQL database, Authentication, instant APIs, and real-time subscriptions.
-    *   **PL/pgSQL**: <img alt="PL/pgSQL" src="https://img.shields.io/badge/-PL%2FpgSQL-336791?style=flat-square&logo=postgresql&logoColor=white" /> - Procedural language for PostgreSQL, typically used in Supabase functions.
+| Category        | Technology                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| :-------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frontend**    | [![React](https://img.shields.io/badge/React-%2320232A.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://react.dev/) <br> [![TypeScript](https://img.shields.io/badge/TypeScript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) <br> [![Vite](https://img.shields.io/badge/Vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/) <br> [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/) <br> ![Radix UI](https://img.shields.io/badge/Radix%20UI-black?style=for-the-badge&logo=radix-ui&logoColor=white) |
+| **Styling**     | [![CSS3](https://img.shields.io/badge/CSS3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS) <br> [![PostCSS](https://img.shields.io/badge/PostCSS-F7E00C?style=for-the-badge&logo=postcss&logoColor=white)](https://postcss.org/)                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Backend/DB**  | [![Supabase](https://img.shields.io/badge/Supabase-%233ECF8E.svg?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/) <br> [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Tooling**     | [![ESLint](https://img.shields.io/badge/ESLint-%234B32C3.svg?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/) <br> [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/) <br> [![NPM](https://img.shields.io/badge/npm-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/)                                                                                                                                                                                                                                                                                                                           |
+| **Deployment**  | [![Vercel](https://img.shields.io/badge/Vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
-### Tooling
-*   **ESLint**: <img alt="ESLint" src="https://img.shields.io/badge/-ESLint-4B32C3?style=flat-square&logo=eslint&logoColor=white" /> - Pluggable linting utility for JavaScript and JSX.
-*   **Vercel**: <img alt="Vercel" src="https://img.shields.io/badge/-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" /> - Platform for frontend developers, providing global deployment and continuous integration.
-
-## ⬇️ Installation
+## 🚀 Installation
 
 To get `repo-readme-bot` up and running on your local machine, follow these steps:
 
 ### Prerequisites
 
-*   Node.js (v18 or higher)
-*   npm or Yarn (npm recommended)
-*   Git
+Make sure you have Node.js (and npm/bun) installed.
 
-### Clone the repository
+*   **Node.js**: [Download & Install Node.js](https://nodejs.org/en/download/)
+*   **Bun**: [Install Bun](https://bun.sh/docs/installation) (Optional, but used in the project configuration)
+
+### Steps
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/Tatz21/repo-readme-bot.git
+    cd repo-readme-bot
+    ```
+
+2.  **Install Dependencies**
+    You can use either `npm` or `bun` for package management.
+
+    Using `npm`:
+    ```bash
+    npm install
+    ```
+
+    Using `bun`:
+    ```bash
+    bun install
+    ```
+
+3.  **Setup Environment Variables**
+    Create a `.env` file in the root directory and add your environment variables. This typically includes API keys for any services the bot might interact with (e.g., AI services).
+
+    ```dotenv
+    # Example .env content
+    VITE_SOME_API_KEY=your_api_key_here
+    SUPABASE_URL=your_supabase_project_url
+    SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+    *Note: Replace placeholder values with your actual keys.*
+
+4.  **Run the Development Server**
+    Start the development server to view the application in your browser.
+
+    Using `npm`:
+    ```bash
+    npm run dev
+    ```
+
+    Using `bun`:
+    ```bash
+    bun dev
+    ```
+
+    The application should now be running at `http://localhost:5173` (or another port if 5173 is in use).
+
+## 💡 Usage
+
+Once the application is running, you can access it via your web browser. The interface will guide you through generating a README.
+
+### Generating a README
+
+1.  **Access the Application:** Open your browser and navigate to `http://localhost:5173`.
+2.  **Input Repository Details:** You'll likely be prompted to enter GitHub repository details (e.g., URL, owner, repository name).
+3.  **Customize Sections:** Use the interactive UI (powered by Radix UI components) to select desired sections (Key Features, Tech Stack, Installation, etc.) and provide specific content where needed.
+4.  **Review and Generate:** Once satisfied, click the "Generate README" button.
+5.  **Copy Output:** The generated markdown will be displayed, which you can then copy and paste into your `README.md` file on GitHub.
+
+### Example Code Snippets (Illustrative)
+
+While the bot's usage is primarily through its UI, here's a conceptual example of how a generated README might look for a simple project:
+
+```markdown
+# My Awesome Project ✨
+
+A brief and engaging description of your project.
+
+## 🚀 Installation
 
 ```bash
-git clone https://github.com/Tatz21/repo-readme-bot.git
-cd repo-readme-bot
-```
-
-### Install Dependencies
-
-Using npm:
-
-```bash
+git clone https://github.com/your-username/my-awesome-project.git
+cd my-awesome-project
 npm install
+npm start
 ```
 
-### Environment Variables
+## 💡 Usage
 
-Create a `.env` file in the root directory of the project and add your Supabase credentials and other necessary environment variables.
+```javascript
+// Example usage of your project's API or main functionality
+import { AwesomeModule } from 'my-awesome-project';
 
-```env
-VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
-VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-# Add any other environment variables your project might need
+const result = AwesomeModule.doSomething('input');
+console.log(result);
+```
 ```
 
-### Set up Supabase (Optional, for full functionality)
-
-1.  If you plan to use Supabase for its database or authentication features, ensure you have a project set up on the [Supabase dashboard](https://app.supabase.com/).
-2.  Copy your Project URL and `anon` key into the `.env` file as shown above.
-3.  Refer to the `supabase` directory in the project for any SQL migrations or edge functions you might need to deploy.
-
-### Run the Development Server
-
-Using npm:
-
-```bash
-npm run dev
-```
-
-This will start the development server, usually at `http://localhost:5173`. Open your browser to this address to see the application running.
-
-## 🚀 Usage
-
-Once the development server is running, you can interact with the `repo-readme-bot` through its web interface.
-
-1.  **Navigate to the application:** Open `http://localhost:5173` in your web browser.
-2.  **Input Repository Details:** The UI will likely prompt you to enter the GitHub repository URL or other relevant details (e.g., owner, repo name).
-3.  **Customize README Options:** Depending on the implemented features, you might have options to select specific sections, add custom content, or define the style of your README.
-4.  **Generate README:** Click the "Generate README" or similar button.
-5.  **View/Copy README:** The generated README.md content will be displayed, allowing you to review, copy, and paste it directly into your GitHub repository.
-
-### Example (Conceptual)
-
-Let's imagine the bot has an input field for a GitHub repository URL:
-
-```html
-<!-- This is a conceptual representation of UI interaction -->
-<input type="text" id="repoUrl" placeholder="Enter GitHub Repository URL (e.g., Tatz21/repo-readme-bot)">
-<button onclick="generateReadme()">Generate README</button>
-
-<pre id="readmeOutput">
-    <!-- Generated README will appear here -->
-</pre>
-
-<script>
-    async function generateReadme() {
-        const repoUrl = document.getElementById('repoUrl').value;
-        if (!repoUrl) {
-            alert('Please enter a repository URL.');
-            return;
-        }
-        // In a real application, this would be an API call to your backend
-        // For demonstration, let's just simulate the output
-        const generatedContent = `
-# My Awesome Project 🌟
-
-This is a **fantastic** project that does amazing things!
-
-## Key Features
-
-*   🚀 Super fast
-*   ✨ Beautiful UI
-*   💾 Stores data effectively
-
-## Tech Stack
-... (details based on repoUrl analysis) ...
-        `;
-        document.getElementById('readmeOutput').textContent = generatedContent;
-    }
-</script>
-```
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
-repo-readme-bot/
-├── public/                 # Static assets
-├── src/                    # All source code
-│   ├── assets/             # Images, fonts, etc.
-│   ├── components/         # Reusable UI components (Shadcn UI, custom)
-│   ├── lib/                # Utility functions, helpers
-│   ├── hooks/              # React hooks
-│   ├── pages/              # Main application pages/routes
-│   ├── App.tsx             # Main application component
-│   └── main.tsx            # Entry point for React app
-├── supabase/               # Supabase related files (migrations, functions)
-├── .env                    # Environment variables
-├── .gitignore              # Files to ignore in Git
-├── README.md               # This file
-├── bun.lockb               # Bun lockfile (if Bun was used, npm lock is also present)
-├── components.json         # Shadcn UI configuration
-├── eslint.config.js        # ESLint configuration
-├── index.html              # Main HTML file
-├── package-lock.json       # npm lockfile
-├── package.json            # Project dependencies and scripts
-├── postcss.config.js       # PostCSS configuration (for Tailwind CSS)
-├── tailwind.config.ts      # Tailwind CSS configuration
-├── tsconfig.app.json       # TypeScript configuration for the React app
-├── tsconfig.json           # Base TypeScript configuration
-├── tsconfig.node.json      # TypeScript configuration for Node environment
-├── vercel.json             # Vercel deployment configuration
-└── vite.config.ts          # Vite configuration
+.
+├── .env
+├── .gitignore
+├── README.md
+├── bun.lockb
+├── components.json             # Shadcn/Radix UI component configuration
+├── eslint.config.js            # ESLint configuration
+├── index.html                  # Main HTML entry point
+├── package-lock.json (or bun.lockb)
+├── package.json                # Project dependencies and scripts
+├── postcss.config.js           # PostCSS configuration
+├── public/                     # Static assets
+│   └── ...
+├── src/                        # Source code
+│   ├── assets/
+│   ├── components/             # React components (likely using Radix UI)
+│   ├── lib/                    # Utility functions, helpers
+│   ├── pages/                  # Application pages/views
+│   ├── styles/
+│   └── main.tsx                # Main application entry
+├── supabase/                   # Supabase related files (migrations, RLS)
+│   └── ...
+├── tailwind.config.ts          # Tailwind CSS configuration
+├── tsconfig.app.json           # TypeScript configuration for application
+├── tsconfig.json               # Base TypeScript configuration
+├── tsconfig.node.json          # TypeScript configuration for Node environment
+├── vercel.json                 # Vercel deployment configuration
+└── vite.config.ts              # Vite build configuration
 ```
 
 ## 🤝 Contributing
 
-We welcome contributions of all kinds! Whether it's reporting bugs, suggesting features, or submitting pull requests, your help is highly appreciated.
+We welcome contributions of all kinds! If you're interested in improving `repo-readme-bot`, please take a moment to review our guidelines:
 
-To contribute:
+1.  **Fork the Repository**: Start by forking the `repo-readme-bot` repository to your GitHub account.
+2.  **Create a New Branch**: Create a new branch from `main` for your feature or bug fix.
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+3.  **Make Changes**: Implement your changes and ensure they adhere to the existing code style.
+4.  **Test Your Changes**: Run tests to confirm everything is working as expected.
+    ```bash
+    # npm
+    npm test
+    # bun
+    bun test
+    ```
+5.  **Commit Your Changes**: Write clear and descriptive commit messages.
+    ```bash
+    git commit -m "feat: Add new awesome feature"
+    ```
+6.  **Push to Your Fork**: Push your branch to your forked repository.
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+7.  **Open a Pull Request**: Submit a pull request to the `main` branch of the original repository. Provide a detailed description of your changes.
 
-1.  **Fork** the repository.
-2.  **Create a new branch** for your feature or bug fix: `git checkout -b feature/your-feature-name` or `fix/bug-description`.
-3.  **Make your changes**, ensuring you follow the project's coding style and conventions.
-4.  **Write clear commit messages** explaining your changes.
-5.  **Push your branch** to your forked repository.
-6.  **Open a Pull Request** to the `main` branch of the original repository.
+Code of Conduct: Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
 
-Please provide a detailed description of your changes in the pull request. Thank you for making `repo-readme-bot` better!
+## 📄 License
 
-## 📜 License
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-This project is currently unlicensed. It is recommended to choose and add a suitable open-source license (e.g., MIT, Apache 2.0, GPL) to define terms of use and distribution.
-For example, to apply the MIT License, create a `LICENSE` file in the root of the project with the following content:
-
-```
-MIT License
-
-Copyright (c) [YEAR] [COPYRIGHT HOLDER]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+Distributed under the MIT License.
+Copyright (c) 2024 Tatz21. All rights reserved.
