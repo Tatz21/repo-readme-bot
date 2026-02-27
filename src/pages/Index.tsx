@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { RepoInput } from '@/components/RepoInput';
 import { ReadmePreview } from '@/components/ReadmePreview';
 import { LoadingState } from '@/components/LoadingState';
@@ -8,12 +8,12 @@ import { TemplatePresets } from '@/components/TemplatePresets';
 import { ShareDialog } from '@/components/ShareDialog';
 import { BulkGenerator } from '@/components/BulkGenerator';
 import { ReadmeScore } from '@/components/ReadmeScore';
-import { BrandingSettings } from '@/components/BrandingSettings';
+
 import { ImportReadme } from '@/components/ImportReadme';
 import { SectionEditor } from '@/components/SectionEditor';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github, History, Share2, Layers, BarChart3, Paintbrush, Upload, User, LogOut } from 'lucide-react';
+
+import { FileText, Zap, Wand2, Settings2, RefreshCw, Sparkles, Github, Share2, Layers, BarChart3, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -37,24 +37,16 @@ export default function Index() {
   const [showShare, setShowShare] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
   const [showScore, setShowScore] = useState(false);
-  const [showBranding, setShowBranding] = useState(false);
+  
   const [showImport, setShowImport] = useState(false);
   const [editingSection, setEditingSection] = useState<{ title: string; content: string } | null>(null);
   const [lastUrl, setLastUrl] = useState<string>('');
-  const [user, setUser] = useState<any>(null);
-  const [branding, setBranding] = useState<{ logo_url: string; footer: string }>({ logo_url: '', footer: '' });
+  
+  
   const { toast } = useToast();
   const location = useLocation();
-  const navigate = useNavigate();
+  
 
-  // Auth listener
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user || null));
-    return () => subscription.unsubscribe();
-  }, []);
 
   // Restore from history navigation
   useEffect(() => {
@@ -153,22 +145,6 @@ export default function Index() {
         setReadme(readmeContent);
         toast({ title: regenerate ? "README Regenerated!" : "README Generated!" });
 
-        // Save to history if logged in
-        if (user && currentRepoInfo) {
-          const repoName = currentRepoInfo.name;
-          const repoOwner = currentRepoInfo.owner;
-          // Get version count
-          const { count } = await supabase.from('readme_history' as any).select('*', { count: 'exact', head: true }).eq('repo_url', url).eq('user_id', user.id);
-          await supabase.from('readme_history' as any).insert({
-            user_id: user.id,
-            repo_url: url,
-            repo_name: repoName,
-            repo_owner: repoOwner,
-            readme_content: readmeContent,
-            options,
-            version: (count || 0) + 1,
-          });
-        }
       }
     } catch (error) {
       console.error('Generation error:', error);
@@ -208,10 +184,6 @@ export default function Index() {
     setEditingSection(null);
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast({ title: 'Signed out' });
-  };
 
   const features = [
     { icon: Github, title: 'Fetch & Analyze', description: 'Automatically extracts repo structure, languages, and dependencies' },
@@ -225,10 +197,10 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background bg-grid-pattern">
       {showOptions && <StyleOptions options={options} onChange={handleOptionsChange} onClose={() => setShowOptions(false)} />}
-      {showShare && repoInfo && <ShareDialog readme={readme} repoName={repoInfo.name} repoUrl={repoInfo.url} branding={branding} onClose={() => setShowShare(false)} />}
+      {showShare && repoInfo && <ShareDialog readme={readme} repoName={repoInfo.name} repoUrl={repoInfo.url} branding={{ logo_url: '', footer: '' }} onClose={() => setShowShare(false)} />}
       {showBulk && <BulkGenerator onClose={() => setShowBulk(false)} options={options} />}
       {showScore && <ReadmeScore readme={readme} repoName={repoInfo?.name || ''} onClose={() => setShowScore(false)} />}
-      {showBranding && <BrandingSettings onClose={() => setShowBranding(false)} onSave={setBranding} />}
+      
       {showImport && <ImportReadme onImport={(r) => { setReadme(r); setRepoInfo({ name: 'Imported', owner: 'user', description: 'Imported README', language: '', stars: 0, forks: 0, url: '' }); }} onClose={() => setShowImport(false)} />}
       {editingSection && repoInfo && (
         <SectionEditor
@@ -259,12 +231,6 @@ export default function Index() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              {user && (
-                <Button variant="ghost" size="sm" onClick={() => navigate('/history')} className="gap-1.5">
-                  <History className="w-4 h-4" />
-                  <span className="hidden sm:inline">History</span>
-                </Button>
-              )}
               <Button variant="outline" size="sm" onClick={() => setShowBulk(true)} className="gap-1.5 hidden sm:flex">
                 <Layers className="w-4 h-4" />
                 Bulk
@@ -277,21 +243,6 @@ export default function Index() {
                 <Settings2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Customize</span>
               </Button>
-              {user ? (
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setShowBranding(true)}>
-                    <Paintbrush className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                    <LogOut className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : (
-                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="gap-1.5">
-                  <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Sign In</span>
-                </Button>
-              )}
             </div>
           </div>
         </header>
