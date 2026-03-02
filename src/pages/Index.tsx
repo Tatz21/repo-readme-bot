@@ -335,6 +335,31 @@ export default function Index() {
           )}
         </section>
 
+        {/* How to Use */}
+        {!readme && !isLoading && (
+          <section className="container mx-auto px-4 pb-16">
+            <div className="max-w-3xl mx-auto text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">How to Use</h2>
+              <p className="text-muted-foreground">Generate a professional README in three simple steps</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {[
+                { step: '1', title: 'Paste URL', description: 'Copy any public GitHub repository URL and paste it in the input field above.' },
+                { step: '2', title: 'Customize', description: 'Pick a style (Minimal, Detailed, or Badges) and toggle the sections you want.' },
+                { step: '3', title: 'Generate', description: 'Hit Generate and get a polished README instantly. Edit, score, share, or download it.' },
+              ].map((item) => (
+                <div key={item.step} className="relative flex flex-col items-center text-center p-6">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center mb-4 text-primary font-bold text-lg">
+                    {item.step}
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2 text-lg">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Features */}
         {!readme && !isLoading && (
           <section className="container mx-auto px-4 pb-20">
