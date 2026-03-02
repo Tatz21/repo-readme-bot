@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BackgroundPaths } from '@/components/ui/background-paths';
 import { useLocation } from 'react-router-dom';
 import { RepoInput } from '@/components/RepoInput';
 import { ReadmePreview } from '@/components/ReadmePreview';
@@ -213,11 +214,7 @@ export default function Index() {
       )}
 
       {/* Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-glow-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '3s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-radial from-primary/5 to-transparent rounded-full blur-3xl animate-pulse-slow" />
-      </div>
+      <BackgroundPaths />
 
       <div className="relative z-10">
         {/* Header */}
