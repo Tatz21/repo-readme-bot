@@ -216,18 +216,27 @@ export default function Index() {
       {/* Background */}
       <BackgroundPaths />
 
-      <div className="relative z-10">
-        {/* Header */}
-        <header className="border-b border-border/50 backdrop-blur-sm bg-background/80">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3 group cursor-default">
-              <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                <FileText className="w-5 h-5 text-primary-foreground" />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Header - sticky mobile app style */}
+        <header className="sticky top-0 z-50 border-b border-border/50 backdrop-blur-xl bg-background/90">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2.5 group cursor-default">
+              <div className="w-9 h-9 rounded-lg bg-gradient-primary flex items-center justify-center">
+                <FileText className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-bold text-xl text-foreground">README<span className="text-gradient">.gen</span></span>
+              <span className="font-bold text-lg text-foreground">README<span className="text-gradient">.gen</span></span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <ThemeToggle />
+              <Button variant="ghost" size="icon" onClick={() => setShowBulk(true)} className="h-9 w-9 sm:hidden">
+                <Layers className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowImport(true)} className="h-9 w-9 sm:hidden">
+                <Upload className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowOptions(true)} className="h-9 w-9 sm:hidden">
+                <Settings2 className="w-4 h-4" />
+              </Button>
               <Button variant="outline" size="sm" onClick={() => setShowBulk(true)} className="gap-1.5 hidden sm:flex">
                 <Layers className="w-4 h-4" />
                 Bulk
@@ -236,147 +245,151 @@ export default function Index() {
                 <Upload className="w-4 h-4" />
                 Import
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5">
+              <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5 hidden sm:flex">
                 <Settings2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Customize</span>
+                Customize
               </Button>
             </div>
           </div>
         </header>
 
-        {/* Hero */}
-        <section className="container mx-auto px-4 pt-16 pb-12">
-          <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
-              <Zap className="w-4 h-4 text-primary" />
-              AI-Powered README Generator
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Generate Perfect<br />
-              <span className="text-gradient animated-gradient-text">README Files</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Paste any GitHub repository URL and get a professional, comprehensive README.md instantly powered by AI.
-            </p>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <span>Style:</span>
-              <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{options.style}</span>
-              <button onClick={() => setShowOptions(true)} className="text-primary hover:underline">Change</button>
-            </div>
-          </div>
-        </section>
-
-        {/* Input */}
-        <section className="container mx-auto px-4 pb-6">
-          <RepoInput onGenerate={(url) => handleGenerate(url)} isLoading={isLoading} />
-        </section>
-
-        {/* Template Presets */}
-        {!readme && !isLoading && (
-          <section className="container mx-auto px-4 pb-8">
-            <TemplatePresets onSelect={handleTemplateSelect} />
-          </section>
-        )}
-
-        {/* Keyboard shortcuts hint */}
-        {!readme && !isLoading && (
-          <section className="container mx-auto px-4 pb-8">
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground font-mono text-[10px]">⌘ Enter</kbd>
-                <span>Regenerate</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <kbd className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground font-mono text-[10px]">⌘ ⇧ C</kbd>
-                <span>Copy README</span>
-              </span>
+        <main className="flex-1">
+          {/* Hero */}
+          <section className="px-4 pt-8 pb-6 sm:pt-16 sm:pb-12 sm:container sm:mx-auto">
+            <div className="text-center space-y-4 sm:space-y-6 max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-secondary text-secondary-foreground text-xs sm:text-sm font-medium">
+                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                AI-Powered README Generator
+              </div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+                Generate Perfect<br />
+                <span className="text-gradient animated-gradient-text">README Files</span>
+              </h1>
+              <p className="text-sm sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                Paste any GitHub repo URL and get a professional README.md instantly.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                <span>Style:</span>
+                <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-medium capitalize">{options.style}</span>
+                <button onClick={() => setShowOptions(true)} className="text-primary hover:underline">Change</button>
+              </div>
             </div>
           </section>
-        )}
 
-        {/* Action bar when readme exists */}
-        {readme && !isLoading && lastUrl && (
-          <section className="container mx-auto px-4 pb-4">
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5">
-                <Settings2 className="w-4 h-4" />
-                Settings
-              </Button>
-              <Button variant="glow" size="sm" onClick={() => handleGenerate(lastUrl, true)} className="gap-1.5">
-                <RefreshCw className="w-4 h-4" />
-                Regenerate
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setShowShare(true)} className="gap-1.5">
-                <Share2 className="w-4 h-4" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setShowScore(true)} className="gap-1.5">
-                <BarChart3 className="w-4 h-4" />
-                Score
-              </Button>
-            </div>
+          {/* Input */}
+          <section className="px-4 pb-4 sm:pb-6 sm:container sm:mx-auto">
+            <RepoInput onGenerate={(url) => handleGenerate(url)} isLoading={isLoading} />
           </section>
-        )}
 
-        {/* Loading / Result */}
-        <section className="container mx-auto px-4 pb-16">
-          {isLoading && !readme && <LoadingState />}
-          {readme && repoInfo && (
-            <ReadmePreview
-              readme={readme}
-              repoInfo={repoInfo}
-              onReadmeUpdate={handleReadmeUpdate}
-              isStreaming={isStreaming}
-              onSectionEdit={handleSectionEdit}
-            />
+          {/* Template Presets */}
+          {!readme && !isLoading && (
+            <section className="px-4 pb-6 sm:pb-8 sm:container sm:mx-auto">
+              <TemplatePresets onSelect={handleTemplateSelect} />
+            </section>
           )}
-        </section>
 
-        {/* How to Use */}
-        {!readme && !isLoading && (
-          <section className="container mx-auto px-4 pb-16">
-            <div className="max-w-3xl mx-auto text-center mb-10">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">How to Use</h2>
-              <p className="text-muted-foreground">Generate a professional README in three simple steps</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {[
-                { step: '1', title: 'Paste URL', description: 'Copy any public GitHub repository URL and paste it in the input field above.' },
-                { step: '2', title: 'Customize', description: 'Pick a style (Minimal, Detailed, or Badges) and toggle the sections you want.' },
-                { step: '3', title: 'Generate', description: 'Hit Generate and get a polished README instantly. Edit, score, share, or download it.' },
-              ].map((item) => (
-                <div key={item.step} className="relative flex flex-col items-center text-center p-6">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center mb-4 text-primary font-bold text-lg">
-                    {item.step}
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2 text-lg">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+          {/* Keyboard shortcuts hint - desktop only */}
+          {!readme && !isLoading && (
+            <section className="hidden sm:block container mx-auto px-4 pb-8">
+              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground font-mono text-[10px]">⌘ Enter</kbd>
+                  <span>Regenerate</span>
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <kbd className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground font-mono text-[10px]">⌘ ⇧ C</kbd>
+                  <span>Copy README</span>
+                </span>
+              </div>
+            </section>
+          )}
 
-        {/* Features */}
-        {!readme && !isLoading && (
-          <section className="container mx-auto px-4 pb-20">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {features.map((feature) => (
-                <div key={feature.title} className="group p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-                  <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
-                    <feature.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </div>
-              ))}
-            </div>
+          {/* Action bar - sticky bottom on mobile */}
+          {readme && !isLoading && lastUrl && (
+            <section className="sticky bottom-0 z-40 bg-background/90 backdrop-blur-xl border-t border-border/50 px-4 py-3 sm:relative sm:border-t-0 sm:bg-transparent sm:backdrop-blur-none sm:container sm:mx-auto sm:pb-4">
+              <div className="flex items-center justify-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setShowOptions(true)} className="gap-1.5 flex-1 sm:flex-none">
+                  <Settings2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Settings</span>
+                </Button>
+                <Button variant="glow" size="sm" onClick={() => handleGenerate(lastUrl, true)} className="gap-1.5 flex-1 sm:flex-none">
+                  <RefreshCw className="w-4 h-4" />
+                  <span className="hidden sm:inline">Regenerate</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setShowShare(true)} className="gap-1.5 flex-1 sm:flex-none">
+                  <Share2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Share</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setShowScore(true)} className="gap-1.5 flex-1 sm:flex-none">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Score</span>
+                </Button>
+              </div>
+            </section>
+          )}
+
+          {/* Loading / Result */}
+          <section className="px-4 pb-8 sm:pb-16 sm:container sm:mx-auto">
+            {isLoading && !readme && <LoadingState />}
+            {readme && repoInfo && (
+              <ReadmePreview
+                readme={readme}
+                repoInfo={repoInfo}
+                onReadmeUpdate={handleReadmeUpdate}
+                isStreaming={isStreaming}
+                onSectionEdit={handleSectionEdit}
+              />
+            )}
           </section>
-        )}
+
+          {/* How to Use */}
+          {!readme && !isLoading && (
+            <section className="px-4 pb-10 sm:pb-16 sm:container sm:mx-auto">
+              <div className="max-w-3xl mx-auto text-center mb-6 sm:mb-10">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2">How to Use</h2>
+                <p className="text-sm sm:text-base text-muted-foreground">Three simple steps</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-8 max-w-4xl mx-auto">
+                {[
+                  { step: '1', title: 'Paste URL', description: 'Copy any public GitHub repo URL and paste it above.' },
+                  { step: '2', title: 'Customize', description: 'Pick a style and toggle the sections you want.' },
+                  { step: '3', title: 'Generate', description: 'Get a polished README instantly. Edit, score, share, or download.' },
+                ].map((item) => (
+                  <div key={item.step} className="flex flex-row sm:flex-col items-center sm:text-center p-4 sm:p-6 rounded-xl bg-card/50 sm:bg-transparent border border-border/50 sm:border-0 gap-4 sm:gap-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center sm:mb-4 text-primary font-bold text-base sm:text-lg">
+                      {item.step}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-0.5 sm:mb-2 text-base sm:text-lg">{item.title}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Features */}
+          {!readme && !isLoading && (
+            <section className="px-4 pb-12 sm:pb-20 sm:container sm:mx-auto">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 max-w-5xl mx-auto">
+                {features.map((feature) => (
+                  <div key={feature.title} className="group p-4 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-secondary flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/10 transition-all duration-300">
+                      <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-1 sm:mb-2 text-sm sm:text-base">{feature.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
 
         <footer className="border-t border-border/50">
-          <div className="container mx-auto px-4 py-6">
-            <p className="text-center text-sm text-muted-foreground">
+          <div className="px-4 py-4 sm:py-6">
+            <p className="text-center text-xs sm:text-sm text-muted-foreground">
               Built with <span className="text-primary">♥</span> • Powered by AI
             </p>
           </div>
